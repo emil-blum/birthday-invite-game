@@ -320,8 +320,8 @@ const ETYPES = {
   // land on the surface, not the transparent bottom padding of the sprite frame.
   // pink/dude art fills to the frame bottom → fo = sh. snake body fills bottom → fo = sh.
   // scorpio art fills to y=47 in 48px frame → fo = 48 (1px transparent below).
-  pink:    { imgW:'pinkWalk',    imgI:'pinkIdle',    fw:6, fi:4, sw:32, sh:32, hbx:7,  hby:5,  hbw:14, hbh:24, fo:32, spd:0.38, pts:100, facesLeft:false, groundOnly:false },
-  dude:    { imgW:'dudeWalk',    imgI:'dudeIdle',    fw:6, fi:4, sw:32, sh:32, hbx:7,  hby:5,  hbw:14, hbh:24, fo:32, spd:0.40, pts:100, facesLeft:false, groundOnly:false },
+  pink:    { imgW:'pinkWalk',    imgI:'pinkIdle',    fw:6, fi:4, sw:32, sh:32, hbx:9,  hby:8,  hbw:12, hbh:20, fo:32, spd:0.38, pts:100, facesLeft:false, groundOnly:false },
+  dude:    { imgW:'dudeWalk',    imgI:'dudeIdle',    fw:6, fi:4, sw:32, sh:32, hbx:9,  hby:8,  hbw:12, hbh:20, fo:32, spd:0.40, pts:100, facesLeft:false, groundOnly:false },
   snake:   { imgW:'snakeWalk',   imgI:'snakeIdle',   imgA:'snakeAttack',   fa:6, fw:4, fi:4, sw:48, sh:48, hbx:16, hby:33, hbw:28, hbh:14, fo:48, spd:0.32, pts:150, facesLeft:true,  groundOnly:true,  atkRange:88, atkHitRange:44 },
   scorpio: { imgW:'scorpioWalk', imgI:'scorpioIdle', imgA:'scorpioAttack', fa:4, fw:4, fi:4, sw:48, sh:48, hbx:15, hby:28, hbw:26, hbh:18, fo:48, spd:0.42, pts:150, facesLeft:true,  groundOnly:true,  atkRange:84, atkHitRange:42 },
 };
@@ -552,7 +552,7 @@ function resolveEnemy(e) {
         const lands = (prevFeet <= p.y + 2) ||
                       aabb(e.x + tp.hbx, e.y + tp.hby, tp.hbw, tp.hbh, p.x, p.y, p.w, p.h);
         if (lands) {
-          const ox = Math.min(e.x + tp.sw, p.x + p.w) - Math.max(e.x, p.x);
+          const ox = Math.min(e.x + tp.hbx + tp.hbw, p.x + p.w) - Math.max(e.x + tp.hbx, p.x);
           if (ox > 0 && e.y + tp.fo >= p.y) {
             e.y = p.y - tp.fo; e.vy = 0; e.onGround = true;
           }
