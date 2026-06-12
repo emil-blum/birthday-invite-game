@@ -30,7 +30,10 @@ let S = 1, cssS = 1;
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
-  cssS = Math.min(window.innerWidth / GW, window.innerHeight / GH);
+  const portrait = window.innerWidth < window.innerHeight;
+  const vw = portrait ? window.innerHeight : window.innerWidth;
+  const vh = portrait ? window.innerWidth  : window.innerHeight;
+  cssS = Math.min(vw / GW, vh / GH);
   S    = cssS * dpr;
   canvas.width  = Math.round(GW * S);
   canvas.height = Math.round(GH * S);
@@ -365,8 +368,18 @@ function setGameLang(lang) {
 
 function introClick(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
-  const gx = (clientX - rect.left) / cssS;
-  const gy = (clientY - rect.top)  / cssS;
+  let gx, gy;
+  if (window.innerWidth < window.innerHeight) {
+    // Canvas is rotated 90deg CW — un-rotate touch coords to get game coords
+    const ctrX = rect.left + rect.width  / 2;
+    const ctrY = rect.top  + rect.height / 2;
+    const dx = clientX - ctrX, dy = clientY - ctrY;
+    gx = (dy + (GW * cssS) / 2) / cssS;
+    gy = (-dx + (GH * cssS) / 2) / cssS;
+  } else {
+    gx = (clientX - rect.left) / cssS;
+    gy = (clientY - rect.top)  / cssS;
+  }
   if (gx >= _lbEN.x && gx <= _lbEN.x + _lbEN.w && gy >= _lbEN.y && gy <= _lbEN.y + _lbEN.h) {
     setGameLang('en'); return;
   }

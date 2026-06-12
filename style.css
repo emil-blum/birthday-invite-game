@@ -18,17 +18,23 @@ html, body {
   background:#3a5e2a;
 }
 
-/* ── ROTATE OVERLAY (portrait mobile) ── */
-#rotate-overlay {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#0a1a04;
-  z-index:100;
-  place-items:center;
-}
+/* ── ROTATE OVERLAY ── hidden — we auto-rotate the canvas instead */
+#rotate-overlay { display:none !important; }
+
+/* ── AUTO-ROTATE in portrait: spin canvas to landscape ── */
 @media (max-aspect-ratio: 1/1) {
-  #rotate-overlay { display:grid; }
+  #c { transform: rotate(90deg); }
+
+  /* Touch controls move to the right edge, stacked vertically */
+  #tc {
+    top:0; bottom:0;
+    right:0; left:auto;
+    width:auto;
+    flex-direction:column-reverse;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 10px;
+  }
 }
 .rotate-msg {
   font-family:'Press Start 2P', monospace;
@@ -70,6 +76,25 @@ html, body {
   to   { transform:scale(1); opacity:1; }
 }
 
+/* ── LANGUAGE TOGGLE ── */
+.lang-toggle {
+  position:absolute;
+  top:8px; right:8px;
+  font-family:'Press Start 2P', monospace;
+  font-size:7px;
+  background:#1a1a3a;
+  border:2px solid #555;
+  color:#aaa;
+  padding:4px 7px;
+  cursor:pointer;
+  letter-spacing:0.05em;
+}
+.lang-toggle:hover { color:#fff; border-color:#f8c000; }
+
+/* Bilingual show/hide */
+#card.lang-en .pt { display:none; }
+#card.lang-pt .en { display:none; }
+
 /* Header */
 .c-header {
   font-family:'Press Start 2P', monospace;
@@ -105,13 +130,18 @@ html, body {
 }
 
 /* RSVP section */
+@keyframes rsvpFlash {
+  0%, 49% { opacity:1; }
+  50%, 100% { opacity:0; }
+}
 .rsvp-section-title {
   font-family:'Press Start 2P', monospace;
   font-size:13px;
-  color:#ffe040;   /* same gold as MADIS TURNS 7! */
+  color:#ffe040;
   text-align:center;
   margin:4px 0 8px;
   letter-spacing:0.08em;
+  animation:rsvpFlash 1.1s steps(1) infinite;
 }
 .rsvp-question {
   font-family:'Pixelify Sans', sans-serif;
@@ -190,8 +220,8 @@ html, body {
 .px-input::placeholder { color:#555; }
 .px-input:focus { border-color:#f8c000; }
 
-/* Thanks message */
-#rsvp-thanks {
+/* Thanks messages */
+.rsvp-thanks-block {
   display:none;
   margin-bottom:10px;
 }
