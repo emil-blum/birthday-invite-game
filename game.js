@@ -99,12 +99,12 @@ function sr(x, y, w, h, col) {
 }
 function txtP(str, x, y, col, px, align = 'center') {
   ctx.fillStyle = col; ctx.textAlign = align;
-  ctx.font = `${Math.round(px * S)}px 'Press Start 2P'`;
+  ctx.font = `700 ${Math.round(px * S)}px 'PixeloidSans'`;
   ctx.fillText(str, Math.round(x * S), Math.round(y * S));
 }
 function txtF(str, x, y, col, px, align = 'center') {
   ctx.fillStyle = col; ctx.textAlign = align;
-  ctx.font = `400 ${Math.round(px * S)}px 'Pixelify Sans'`;
+  ctx.font = `400 ${Math.round(px * S)}px 'PixeloidSans'`;
   ctx.fillText(str, Math.round(x * S), Math.round(y * S));
 }
 
@@ -153,6 +153,46 @@ let dying = { active: false, tick: 0 };
 let fadeAlpha = 0;
 
 // ════════════════════════════════════════════
+//  AUDIO
+// ════════════════════════════════════════════
+const SFX = {};
+let audioReady = false;
+let themeStopped = false; // true when QB hit — resumes on modal close
+
+function loadSnd(key, file, loop = false) {
+  const a = new Audio('sounds/' + file);
+  a.loop = loop;
+  a.preload = 'auto';
+  SFX[key] = a;
+}
+loadSnd('theme',   'theme-song.mp3',           true);
+loadSnd('jump',    'jump.mp3');
+loadSnd('coin',    'coin.mp3');
+loadSnd('hurt',    'hurt.mp3');
+loadSnd('death',   'life-restart.mp3');
+loadSnd('box',     'open-box.mp3');
+loadSnd('stomp',   'enemy-defeat.mp3');
+loadSnd('boss',    'confetti-boss-defeat.mp3');
+
+function unlockAudio() {
+  if (audioReady) return;
+  audioReady = true;
+  SFX.theme.play().catch(() => {});
+}
+function sfx(key) {
+  const a = SFX[key];
+  if (!a || !audioReady) return;
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
+function stopTheme()   { SFX.theme.pause(); themeStopped = true; }
+function resumeTheme() {
+  if (!audioReady || !themeStopped) return;
+  themeStopped = false;
+  SFX.theme.play().catch(() => {});
+}
+
+// ════════════════════════════════════════════
 //  PLAYER
 // ════════════════════════════════════════════
 const P = {
@@ -178,7 +218,7 @@ document.addEventListener('keydown', e => {
   if (e.code === 'ArrowLeft'  || e.code === 'KeyA') K.left  = true;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') K.right = true;
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-    if (STATE === 'INTRO') { beginPlay(); return; }
+    if (STATE === 'INTRO') { unlockAudio(); beginPlay(); return; }
     K.jump = true;
   }
   if (['Space','ArrowUp','ArrowLeft','ArrowRight','ArrowDown'].includes(e.code)) e.preventDefault();
@@ -352,7 +392,7 @@ function spawnSquish(wx, wy) {
 //  MODAL / RSVP
 // ════════════════════════════════════════════
 function openModal()  { document.getElementById('modal').classList.add('open'); }
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); resumeTheme(); }
 
 function setGameLang(lang) {
   gameLang = lang;
@@ -364,6 +404,7 @@ function setGameLang(lang) {
 }
 
 function introClick(clientX, clientY) {
+  unlockAudio();
   const rect = canvas.getBoundingClientRect();
   const gx = (clientX - rect.left) / cssS;
   const gy = (clientY - rect.top)  / cssS;
@@ -530,7 +571,9 @@ function takeDamage() {
   P.hurtTick = tick;
   if (P.health > 0) {
     P.invincible = 80;
+    sfx('hurt');
   } else {
+    sfx('death');
     startDying();
   }
 }
@@ -575,6 +618,8 @@ function hitBlock() {
   qblock.hitTick = tick;
   qblock.bounceTick = tick;
   spawnSparkle(QB_X + QB_W / 2, QB_Y);
+  stopTheme();
+  sfx('box');
   setTimeout(openModal, 300);
 }
 
@@ -623,6 +668,7 @@ function update() {
 
   if (K.jump && !K.jumpUsed && P.onGround) {
     P.vy = JUMP_V; P.onGround = false; K.jumpUsed = true;
+    sfx('jump');
   }
   if (P.walk && P.onGround) { if (++P.wt >= 7) { P.wt = 0; P.wf = (P.wf + 1) % 6; } }
   else if (!P.walk) P.wf = 0;
@@ -638,6 +684,7 @@ function update() {
       c.alive = false; score += 10;
       spawnSparkle(c.x + 8, c.y + 8);
       spawnPopup(c.x + 8, c.y, 100);
+      sfx('coin');
     }
   });
 
@@ -690,6 +737,7 @@ function update() {
         spawnSquish(e.x + tp.sw / 2, e.y + tp.hby);
         spawnPopup(e.x + tp.sw / 2, e.y, tp.pts);
         P.vy = JUMP_V * 0.5;
+        sfx('stomp');
       } else {
         takeDamage();
       }
@@ -733,6 +781,7 @@ function update() {
         boss.alive = false; boss.dead = true; boss.deathTick = tick;
         score += 500;
         spawnConfetti();
+        sfx('boss');
         spawnPopup(boss.x + 36, boss.y + 16, 500);
         P.vy = JUMP_V * 0.55;
         // Boss kill: celebrate with confetti only — ? block is the only way to open party info

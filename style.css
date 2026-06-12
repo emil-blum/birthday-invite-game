@@ -1,3 +1,20 @@
+/* ── FONTS ── */
+@font-face {
+  font-family:'PixeloidSans';
+  src:url('fonts/PixeloidSans-lxa3y.ttf') format('truetype');
+  font-weight:400; font-style:normal;
+}
+@font-face {
+  font-family:'PixeloidSans';
+  src:url('fonts/PixeloidSansBold-1jpBg.ttf') format('truetype');
+  font-weight:700; font-style:normal;
+}
+@font-face {
+  font-family:'PixeloidMono';
+  src:url('fonts/PixeloidMono-nAOpP.ttf') format('truetype');
+  font-weight:400; font-style:normal;
+}
+
 /* ── RESET & LAYOUT ── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
@@ -33,7 +50,7 @@ html, body {
 .rotate-btn {
   display:inline-block;
   margin-top:18px;
-  font-family:'Press Start 2P', monospace;
+  font-family:'PixeloidSans', monospace;
   font-size:8px;
   background:#1a3a0a;
   border:2px solid #f8c000;
@@ -46,13 +63,13 @@ html, body {
 .rotate-btn:active { background:#2a5a14; }
 .rotate-hint {
   margin-top:14px;
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   font-size:13px;
   color:#aaa;
   line-height:1.5;
 }
 .rotate-msg {
-  font-family:'Press Start 2P', monospace;
+  font-family:'PixeloidSans', monospace;
   font-size:12px;
   color:#f8c000;
   text-align:center;
@@ -74,7 +91,7 @@ html, body {
 #modal.open { display:grid; }
 
 #card {
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   background:#0a0a2a;
   color:#fff;
   width:min(380px, 96vw);
@@ -95,7 +112,7 @@ html, body {
 .lang-toggle {
   position:absolute;
   top:8px; right:8px;
-  font-family:'Press Start 2P', monospace;
+  font-family:'PixeloidSans', monospace;
   font-size:7px;
   background:#1a1a3a;
   border:2px solid #555;
@@ -112,8 +129,9 @@ html, body {
 
 /* Header */
 .c-header {
-  font-family:'Press Start 2P', monospace;
-  font-size:15px;
+  font-family:'PixeloidSans', monospace;
+  font-weight:700;
+  font-size:17px;
   color:#f8c000;
   line-height:1.5;
   border-bottom:3px solid #f8c000;
@@ -131,14 +149,14 @@ html, body {
   margin-bottom:14px;
 }
 .c-lbl {
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   color:#74d4f8;
   font-size:14px;
   white-space:nowrap;
   line-height:1.65;
 }
 .c-val {
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   color:#fff;
   font-size:14px;
   line-height:1.65;
@@ -150,8 +168,9 @@ html, body {
   50%, 100% { opacity:0; }
 }
 .rsvp-section-title {
-  font-family:'Press Start 2P', monospace;
-  font-size:13px;
+  font-family:'PixeloidSans', monospace;
+  font-weight:700;
+  font-size:15px;
   color:#ffe040;
   text-align:center;
   margin:4px 0 8px;
@@ -159,7 +178,7 @@ html, body {
   animation:rsvpFlash 1.1s steps(1) infinite;
 }
 .rsvp-question {
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   font-size:17px;
   color:#fff;      /* white, same as detail text */
   text-align:center;
@@ -173,7 +192,7 @@ html, body {
   background:none;
   border:none;
   color:#ccc;
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   font-size:13px;
   cursor:pointer;
   padding:8px;
@@ -202,7 +221,7 @@ html, body {
 .radio-btn {
   display:inline-block;
   padding:8px 12px;
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   font-size:14px;
   border:3px solid #000;
   cursor:pointer;
@@ -221,7 +240,7 @@ html, body {
   margin-bottom:8px;
 }
 .px-input {
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   font-size:14px;
   background:#050518;
   color:#fff;
@@ -241,7 +260,7 @@ html, body {
   margin-bottom:10px;
 }
 .thanks-msg {
-  font-family:'Press Start 2P', monospace;
+  font-family:'PixeloidSans', monospace;
   font-size:9px;
   color:#f8c000;
   margin-bottom:6px;
@@ -257,7 +276,7 @@ html, body {
   display:block;
   width:100%;
   padding:11px 10px;
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   font-size:15px;
   color:#fff;
   text-decoration:none;
@@ -298,7 +317,7 @@ html, body {
   -webkit-tap-highlight-color:transparent;
   background:rgba(20,20,20,0.75);
   border:3px solid #000;
-  font-family:'Press Start 2P', monospace;
+  font-family:'PixeloidSans', monospace;
   box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #555;
   border-radius:4px;
 }
@@ -306,7 +325,7 @@ html, body {
 #bj {
   width:80px; height:80px;
   font-size:13px;
-  font-family:'Pixelify Sans', sans-serif;
+  font-family:'PixeloidSans', sans-serif;
   background:rgba(139,0,0,0.8);
   box-shadow:inset -4px -4px 0 rgba(74,0,0,0.9), inset 4px 4px 0 rgba(212,50,50,0.9);
 }
