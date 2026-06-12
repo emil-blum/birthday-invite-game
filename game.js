@@ -11,13 +11,15 @@ const LW   = 100 * TILE;   // 1600 px
 const GY   = 14 * TILE;    // ground top y = 224
 
 const GRAVITY = 0.28;
-const JUMP_V  = -7.0;
+const JUMP_V  = -8.0;
 const SPEED   = 1.5;
 
-// Player hitbox: 24×40 centered in the 48×48 sprite frame
-const PW = 24, PH = 40;
+// Player hitbox: 14×26, matched to actual boy art (measured: x=3–22, y=22–47 in 48×48 frame)
+const PW = 14, PH = 26;
 const P_SW = 48, P_SH = 48;
-const P_OX = 12, P_OY = 8;   // hitbox offset from sprite origin
+// P_OY: positions sprite so art bottom (frame y=47) aligns with hitbox bottom (P.y+PH=GY)
+// P_ART_CX: art horizontal centre in the unflipped frame (measured: (3+22)/2 ≈ 12)
+const P_OY = 21, P_ART_CX = 12;
 
 // ════════════════════════════════════════════
 //  CANVAS
@@ -143,6 +145,8 @@ function aframe(t, frames, fps = 5) {
 //  STATE
 // ════════════════════════════════════════════
 let STATE = 'LOADING';
+let gameLang = 'en';
+let _lbEN = {x:0,y:0,w:0,h:0}, _lbPT = {x:0,y:0,w:0,h:0};
 let tick = 0, score = 0, camX = 0, lives = 5;
 let bannerTick = 0;
 let dying = { active: false, tick: 0 };
@@ -188,7 +192,12 @@ document.addEventListener('keyup', e => {
   }
 });
 
-canvas.addEventListener('touchend', () => { if (STATE === 'INTRO') beginPlay(); }, { passive: false });
+canvas.addEventListener('touchend', e => {
+  if (STATE !== 'INTRO') return;
+  const t = e.changedTouches[0];
+  introClick(t.clientX, t.clientY);
+}, { passive: false });
+canvas.addEventListener('click', e => { if (STATE === 'INTRO') introClick(e.clientX, e.clientY); });
 
 function setupTouch() {
   if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
@@ -255,7 +264,7 @@ let coins = COIN_XY.map(([x, y]) => ({ x, y, alive: true }));
 
 // ── ? Block — further right, near end of level, always shows "?" ──
 const QB_X = 96 * TILE;        // x=1536 (96% of level)
-const QB_Y = GY - 5 * TILE;    // floating 80px above ground
+const QB_Y = GY - 7 * TILE;    // floating 112px above ground — clears boss head (72px)
 const QB_W = 2 * TILE;
 const QB_H = 2 * TILE;
 let qblock = { hitTick: -999, bounceTick: -999 };
@@ -270,11 +279,11 @@ const ETYPES = {
   // fo = visual foot offset from sprite top. Snapping uses fo so visible feet
   // land on the surface, not the transparent bottom padding of the sprite frame.
   // pink/dude art fills to the frame bottom → fo = sh. snake body fills bottom → fo = sh.
-  // scorpio body ends at y≈44 in 48px frame → fo = 44 (4px transparent below).
-  pink:    { imgW:'pinkWalk',    imgI:'pinkIdle',    fw:6, fi:4, sw:32, sh:32, hbx:8,  hby:7,  hbw:16, hbh:22, fo:32, spd:0.38, pts:100, facesLeft:false, groundOnly:false },
-  dude:    { imgW:'dudeWalk',    imgI:'dudeIdle',    fw:6, fi:4, sw:32, sh:32, hbx:8,  hby:7,  hbw:16, hbh:22, fo:32, spd:0.40, pts:100, facesLeft:false, groundOnly:false },
-  snake:   { imgW:'snakeWalk',   imgI:'snakeIdle',   imgA:'snakeAttack',   fa:6, fw:4, fi:4, sw:48, sh:48, hbx:10, hby:36, hbw:28, hbh:12, fo:48, spd:0.32, pts:150, facesLeft:true,  groundOnly:true,  atkRange:88, atkHitRange:52 },
-  scorpio: { imgW:'scorpioWalk', imgI:'scorpioIdle', imgA:'scorpioAttack', fa:4, fw:4, fi:4, sw:48, sh:48, hbx:10, hby:30, hbw:28, hbh:14, fo:44, spd:0.42, pts:150, facesLeft:true,  groundOnly:true,  atkRange:84, atkHitRange:50 },
+  // scorpio art fills to y=47 in 48px frame → fo = 48 (1px transparent below).
+  pink:    { imgW:'pinkWalk',    imgI:'pinkIdle',    fw:6, fi:4, sw:32, sh:32, hbx:7,  hby:5,  hbw:14, hbh:24, fo:32, spd:0.38, pts:100, facesLeft:false, groundOnly:false },
+  dude:    { imgW:'dudeWalk',    imgI:'dudeIdle',    fw:6, fi:4, sw:32, sh:32, hbx:7,  hby:5,  hbw:14, hbh:24, fo:32, spd:0.40, pts:100, facesLeft:false, groundOnly:false },
+  snake:   { imgW:'snakeWalk',   imgI:'snakeIdle',   imgA:'snakeAttack',   fa:6, fw:4, fi:4, sw:48, sh:48, hbx:16, hby:33, hbw:28, hbh:14, fo:48, spd:0.32, pts:150, facesLeft:true,  groundOnly:true,  atkRange:88, atkHitRange:44 },
+  scorpio: { imgW:'scorpioWalk', imgI:'scorpioIdle', imgA:'scorpioAttack', fa:4, fw:4, fi:4, sw:48, sh:48, hbx:15, hby:28, hbw:26, hbh:18, fo:48, spd:0.42, pts:150, facesLeft:true,  groundOnly:true,  atkRange:84, atkHitRange:42 },
 };
 
 // 8 enemies — snake/scorpio ground-only, pink/dude platform-aware
@@ -301,10 +310,10 @@ let enemies = makeEnemies();
 
 // Boss: centipede faces LEFT by default → flip when dir > 0
 let boss = {
-  x: 85*TILE, y: GY-62, vx:0, vy:0, dir:-1,
+  x: 92*TILE, y: GY-72, vx:0, vy:0, dir:-1,
   alive:true, dead:false, deathTick:-1, wt:0,
   onGround: false,
-  px0:81*TILE, px1:91*TILE,
+  px0:88*TILE, px1:100*TILE,
   attacking:false, attackTick:0, attackCd:0,
 };
 
@@ -345,40 +354,73 @@ function spawnSquish(wx, wy) {
 function openModal()  { document.getElementById('modal').classList.add('open'); }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
+function setGameLang(lang) {
+  gameLang = lang;
+  const card = document.getElementById('card');
+  card.classList.toggle('lang-en', lang === 'en');
+  card.classList.toggle('lang-pt', lang === 'pt');
+  const btn = document.getElementById('lang-btn');
+  if (btn) btn.textContent = lang === 'en' ? 'PT' : 'EN';
+}
+
+function introClick(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  const gx = (clientX - rect.left) / cssS;
+  const gy = (clientY - rect.top)  / cssS;
+  if (gx >= _lbEN.x && gx <= _lbEN.x + _lbEN.w && gy >= _lbEN.y && gy <= _lbEN.y + _lbEN.h) {
+    setGameLang('en'); return;
+  }
+  if (gx >= _lbPT.x && gx <= _lbPT.x + _lbPT.w && gy >= _lbPT.y && gy <= _lbPT.y + _lbPT.h) {
+    setGameLang('pt'); return;
+  }
+  beginPlay();
+}
+
 document.getElementById('modal-close').addEventListener('click', closeModal);
 
 (function initRSVP() {
-  const form   = document.getElementById('rsvp-form');
-  const fields = document.getElementById('rsvp-fields');
-  const thanks = document.getElementById('rsvp-thanks');
+  const form       = document.getElementById('rsvp-form');
+  const fields     = document.getElementById('rsvp-fields');
+  const attendVal  = document.getElementById('attend-val');
+  const submitBtn  = document.getElementById('rsvp-submit');
+  const thanksYes  = document.getElementById('rsvp-thanks-yes');
+  const thanksNo   = document.getElementById('rsvp-thanks-no');
 
-  document.querySelectorAll('input[name="attend"]').forEach(radio => {
+  function isPt() {
+    return document.getElementById('card').classList.contains('lang-pt');
+  }
+
+  // Both YES and NO reveal the name fields — only the button label differs
+  document.querySelectorAll('input[name="attend-radio"]').forEach(radio => {
     radio.addEventListener('change', () => {
+      attendVal.value = radio.value;
+      fields.style.display = 'flex';
       if (radio.value === 'yes') {
-        fields.style.display = 'flex';
+        submitBtn.textContent = isPt() ? '[ ENVIAR RSVP ]' : '[ SEND RSVP ]';
+        submitBtn.className = 'px-btn btn-grn';
       } else {
-        fields.style.display = 'none';
-        sendRSVP({ attend: 'no', _subject: "RSVP: NOT attending Madis' 7th" });
-        form.style.display = 'none';
-        thanks.style.display = 'block';
+        submitBtn.textContent = isPt() ? '[ OBRIGADO, NAO POSSO ]' : "[ THANKS, CAN'T COME ]";
+        submitBtn.className = 'px-btn btn-red';
       }
     });
   });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    const btn = document.getElementById('rsvp-submit');
-    btn.textContent = '[ SENDING... ]';
-    btn.disabled = true;
+    submitBtn.textContent = isPt() ? '[ A ENVIAR... ]' : '[ SENDING... ]';
+    submitBtn.disabled = true;
     const data = Object.fromEntries(new FormData(form));
-    data._subject = "RSVP: Attending Madis' 7th Birthday!";
+    const isYes = data.attend === 'yes';
+    data._subject = isYes
+      ? "RSVP: Attending Madis' 8th Birthday!"
+      : "RSVP: NOT attending Madis' 8th Birthday";
     const ok = await sendRSVP(data);
     if (ok) {
       form.style.display = 'none';
-      thanks.style.display = 'block';
+      (isYes ? thanksYes : thanksNo).style.display = 'block';
     } else {
-      btn.textContent = '[ TRY AGAIN ]';
-      btn.disabled = false;
+      submitBtn.textContent = isPt() ? '[ TENTAR NOVAMENTE ]' : '[ TRY AGAIN ]';
+      submitBtn.disabled = false;
     }
   });
 
@@ -513,17 +555,19 @@ function beginPlay() {
   camX = 0; score = 0; lives = 5;
   coins = COIN_XY.map(([x, y]) => ({ x, y, alive: true }));
   enemies = makeEnemies();
-  boss = { x:85*TILE, y:GY-62, vx:0, vy:0, dir:-1,
+  boss = { x:92*TILE, y:GY-72, vx:0, vy:0, dir:-1,
            alive:true, dead:false, deathTick:-1, wt:0, onGround:false,
-           px0:81*TILE, px1:91*TILE, attacking:false, attackTick:0, attackCd:0 };
+           px0:88*TILE, px1:100*TILE, attacking:false, attackTick:0, attackCd:0 };
   qblock = { hitTick: -999, bounceTick: -999 };
   bannerTick = 0;
-  const form   = document.getElementById('rsvp-form');
-  const fields = document.getElementById('rsvp-fields');
-  const thanks = document.getElementById('rsvp-thanks');
-  if (form)   { form.style.display = ''; form.reset(); }
-  if (fields) fields.style.display = 'none';
-  if (thanks) thanks.style.display = 'none';
+  const form      = document.getElementById('rsvp-form');
+  const fields    = document.getElementById('rsvp-fields');
+  const thanksYes = document.getElementById('rsvp-thanks-yes');
+  const thanksNo  = document.getElementById('rsvp-thanks-no');
+  if (form)      { form.style.display = ''; form.reset(); }
+  if (fields)    fields.style.display = 'none';
+  if (thanksYes) thanksYes.style.display = 'none';
+  if (thanksNo)  thanksNo.style.display  = 'none';
 }
 
 function hitBlock() {
@@ -658,7 +702,7 @@ function update() {
     if (boss.attackCd > 0) boss.attackCd--;
     const bDist = Math.abs((P.x + PW / 2) - (boss.x + 36));
     // boss body ends at y+62 in the 72px frame — same 20px tolerance as snake/scorpio
-    const bossSameLevel = Math.abs((P.y + PH) - (boss.y + 62)) < 20;
+    const bossSameLevel = Math.abs((P.y + PH) - (boss.y + 72)) < 20;
 
     if (!boss.attacking && boss.attackCd <= 0 && bDist < 120 && bossSameLevel) {
       boss.attacking = true;
@@ -672,14 +716,14 @@ function update() {
       if (boss.attackTick >= 4 * 12) { boss.attacking = false; boss.attackCd = 140; }
       if (!boss.onGround) boss.vy = Math.min(boss.vy + GRAVITY, 10);
       boss.y += boss.vy;
-      if (boss.y + 62 >= GY) { boss.y = GY - 62; boss.vy = 0; boss.onGround = true; }
+      if (boss.y + 72 >= GY) { boss.y = GY - 72; boss.vy = 0; boss.onGround = true; }
     } else {
       const wasOn = boss.onGround;
       boss.onGround = false;
       if (!wasOn) boss.vy = Math.min(boss.vy + GRAVITY, 10);
-      boss.x += boss.dir * 0.5;
+      boss.x += boss.dir * 0.8;
       boss.y += boss.vy;
-      if (boss.y + 62 >= GY) { boss.y = GY - 62; boss.vy = 0; boss.onGround = true; }
+      if (boss.y + 72 >= GY) { boss.y = GY - 72; boss.vy = 0; boss.onGround = true; }
       if (boss.x <= boss.px0 || boss.x + 72 >= boss.px1) boss.dir *= -1;
     }
 
@@ -825,7 +869,10 @@ function drawHeart(hx, hy, full) {
 }
 
 function drawPlayer() {
-  const sx = P.x - P_OX;
+  // Anchor sprite so art centre always sits at hitbox centre regardless of flip direction.
+  // Facing right: art centre is at frame x=P_ART_CX; facing left (flipped): at P_SW-P_ART_CX.
+  const artCX = P.face > 0 ? P_ART_CX : P_SW - P_ART_CX;
+  const sx = P.x + PW / 2 - artCX;
   const sy = P.y - P_OY;
   const flip = P.face < 0;
 
@@ -995,32 +1042,71 @@ function drawIntro() {
   drawBgLayer('bg4', tick * 0.0004);
   drawBgLayer('bg5', tick * 0.0008);
 
-  const bx = ((tick * 1.2) % (GW + 64)) - 64;
   const savedCam = camX; camX = 0;
-  drawSW('boyWalk', aframe(tick, 6, 7), 6, bx, GH - 64, 48, 48);
+  const numTiles = Math.ceil(GW / TILE) + 1;
+  for (let i = 0; i < numTiles; i++) {
+    drawSW('tileTop', 0, 1, i * TILE, GY, TILE, TILE);
+    for (let row = 1; GY + row * TILE < GH + TILE; row++) {
+      drawSW('tileBody', 0, 1, i * TILE, GY + row * TILE, TILE, TILE);
+    }
+  }
+  const bx = ((tick * 1.2) % (GW + 64)) - 64;
+  drawSW('boyWalk', aframe(tick, 6, 7), 6, bx, GY - 47, 48, 48);
   camX = savedCam;
 
-  const pw = GW - 52, ph = GH - 90, px = 26, py = 22, cx = GW / 2;
-  sr(px, py, pw, ph, 'rgba(0,5,0,0.88)');
+  const pw = GW - 52, ph = GH - 92, px = 26, py = 16, cx = GW / 2;
+  const pt = gameLang === 'pt';
+
+  sr(px, py, pw, ph, 'rgba(0,5,0,0.90)');
   sr(px,      py,      pw, 3, '#f8c000');
   sr(px,      py+ph-3, pw, 3, '#f8c000');
   sr(px,      py,      3,  ph, '#f8c000');
   sr(px+pw-3, py,      3,  ph, '#f8c000');
 
-  txtP("MADIS'",    cx, py + 22, '#ffe040', 12);
-  txtP('BIRTHDAY',  cx, py + 38, '#ff4060', 12);
-  txtF('BIRTHDAY PARTY QUEST!', cx, py + 55, '#ffffff', 14);
+  // Title: two lines
+  txtF(pt ? 'ESTAS CONVIDADO PARA' : "YOU'RE INVITED TO", cx, py + 14, '#aad4ff', 9);
+  txtP("MADIS'", cx, py + 28, '#ffe040', 10);
+  txtP(pt ? 'ANIVERSARIO' : 'BIRTHDAY', cx, py + 42, '#ff8888', 10);
 
-  sr(px + 12, py + 62, pw - 24, 1, '#444');
+  sr(px + 12, py + 52, pw - 24, 1, '#444');
 
-  txtF('Jump under the ? block for party details', cx, py + 76, '#7ecfff', 9);
-  txtF('Stomp enemies for bonus points', cx, py + 90, '#ffaa40', 10);
+  txtF(pt ? 'Pisa os inimigos e encontra'      : 'Stomp the enemies and find',         cx, py + 63, '#7ecfff', 9);
+  txtF(pt ? 'a caixa com os detalhes da festa' : 'the box with the party information', cx, py + 75, '#7ecfff', 9);
 
-  sr(px + 12, py + 100, pw - 24, 1, '#333');
-  txtF('← →  Move     ↑ / SPACE  Jump', cx, py + 114, '#aaa', 9);
+  sr(px + 12, py + 85, pw - 24, 1, '#333');
 
+  txtF(pt ? '← →  mover   /   ↑  saltar' : '← →  move   /   ↑  jump', cx, py + 96, '#aaa', 9);
+
+  sr(px + 12, py + 107, pw - 24, 1, '#333');
+
+  // Language selector
+  txtF('LANGUAGE', cx, py + 117, '#888', 8);
+  const bw = 52, bh = 14, bgap = 10;
+  const enX = cx - bw - bgap / 2, ptX = cx + bgap / 2;
+  const btnY = py + 128;
+  _lbEN = { x: enX, y: btnY, w: bw, h: bh };
+  _lbPT = { x: ptX, y: btnY, w: bw, h: bh };
+
+  const enSel = !pt;
+  sr(enX, btnY, bw, bh, enSel ? '#005500' : '#111');
+  sr(enX, btnY, bw, 2, enSel ? '#44dd44' : '#333');
+  sr(enX, btnY, 2, bh, enSel ? '#44dd44' : '#333');
+  sr(enX+bw-2, btnY, 2, bh, enSel ? '#003300' : '#1a1a1a');
+  sr(enX, btnY+bh-2, bw, 2, enSel ? '#003300' : '#1a1a1a');
+  txtF('EN', enX + bw / 2, btnY + 10, enSel ? '#88ff88' : '#555', 9);
+
+  const ptSel = pt;
+  sr(ptX, btnY, bw, bh, ptSel ? '#005500' : '#111');
+  sr(ptX, btnY, bw, 2, ptSel ? '#44dd44' : '#333');
+  sr(ptX, btnY, 2, bh, ptSel ? '#44dd44' : '#333');
+  sr(ptX+bw-2, btnY, 2, bh, ptSel ? '#003300' : '#1a1a1a');
+  sr(ptX, btnY+bh-2, bw, 2, ptSel ? '#003300' : '#1a1a1a');
+  txtF('PT', ptX + bw / 2, btnY + 10, ptSel ? '#88ff88' : '#555', 9);
+
+  // Start prompt — lower, with clear gap below language buttons
   if (Math.floor(tick / 28) % 2 === 0) {
-    txtF('►  PRESS SPACE OR TAP TO START  ◄', cx, py + 132, '#fff', 10);
+    txtF(pt ? '►  PRIME ESPACO OU TOCA  ◄' : '►  PRESS SPACE OR TAP TO START  ◄',
+         cx, py + 158, '#fff', 9);
   }
 }
 
