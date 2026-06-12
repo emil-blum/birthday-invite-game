@@ -869,10 +869,10 @@ function drawQBlock() {
   ctx.save();
   ctx.fillStyle = '#5a3800';
   ctx.textAlign = 'center';
-  ctx.font = `bold ${Math.round(13 * S)}px 'Press Start 2P'`;
+  ctx.font = `900 ${Math.round(15 * S)}px 'PixeloidSans'`;
   ctx.fillText('?',
     Math.round((bx + bw / 2 - camX) * S),
-    Math.round((by + bh * 0.72) * S));
+    Math.round((by + bh * 0.70) * S));
   ctx.restore();
 }
 
@@ -1021,17 +1021,23 @@ function drawPopups() {
 //  HUD
 // ════════════════════════════════════════════
 function drawHUD() {
-  sr(0, 0, GW, 15, '#0a0f08');
+  sr(0, 0, GW, 16, '#0a0f08');
 
-  txtP(String(score * 10).padStart(6, '0'), 6, 11, '#fff', 6, 'left');
-  txtP(`\xD7${lives}`, GW / 2 - 30, 11, '#fff', 6, 'left');
-  for (let i = 0; i < 3; i++) drawHeart(GW / 2 - 10 + i * 10, 2, i < P.health);
-  drawSS('coin', aframe(tick, 4, 3), 4, GW - 40, 2, 12, 12);
-  txtP(`\xD7${coins.filter(c => !c.alive).length}`, GW - 26, 11, '#f8c000', 6, 'left');
+  // Score — left
+  txtP(String(score * 10).padStart(6, '0'), 4, 12, '#fff', 7, 'left');
 
+  // Lives × + hearts — centre
+  txtP(`\xD7${lives}`, GW / 2 - 24, 12, '#fff', 7, 'left');
+  for (let i = 0; i < 3; i++) drawHeart(GW / 2 - 9 + i * 10, 5, i < P.health);
+
+  // Coin sprite + count — right
+  drawSS('coin', aframe(tick, 4, 3), 4, GW - 38, 2, 12, 12);
+  txtP(`\xD7${coins.filter(c => !c.alive).length}`, GW - 24, 12, '#f8c000', 7, 'left');
+
+  // Progress bar
   const prog = Math.min(1, P.x / QB_X);
-  sr(4, 13, GW - 8, 2, '#1a1a1a');
-  sr(4, 13, (GW - 8) * prog, 2, '#f8c000');
+  sr(4, 14, GW - 8, 2, '#1a1a1a');
+  sr(4, 14, (GW - 8) * prog, 2, '#f8c000');
 }
 
 function drawBanner() {

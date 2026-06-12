@@ -22,10 +22,14 @@ html, body {
   width:100%; height:100%;
   overflow:hidden;
   touch-action:none;
-  background:#1a2e0a;
+  background:#000;
   display:flex;
   justify-content:center;
   align-items:center;
+}
+/* Keep green on touch devices — helps button contrast */
+@media (hover:none) and (pointer:coarse) {
+  html, body { background:#1a2e0a; }
 }
 
 #c {
