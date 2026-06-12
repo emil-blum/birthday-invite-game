@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Madis' Birthday Quest!</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="rotate-overlay">
+  <div class="rotate-msg">
+    <div class="rotate-icon">&#x21BB;</div>
+    <div>Please rotate your<br>device to landscape</div>
+  </div>
+</div>
+
+<canvas id="c"></canvas>
+
+<!-- ── PARTY INFO + RSVP MODAL ── -->
+<div id="modal">
+  <div id="card">
+
+    <div class="c-header">MADIS TURNS 7!</div>
+
+    <div class="c-grid">
+      <span class="c-lbl">DATE &raquo;</span>
+      <span class="c-val">FRI 26 JUNE 2026</span>
+      <span class="c-lbl">TIME &raquo;</span>
+      <span class="c-val">16:00 &ndash; 20:00</span>
+      <span class="c-lbl">WHERE &raquo;</span>
+      <span class="c-val">Praia Fluvial de Felinhos,<br>Lago, Portugal</span>
+    </div>
+
+    <a class="px-btn btn-map" href="https://maps.app.goo.gl/tUTTnRjmzyCPgLY69" target="_blank" rel="noopener">
+      [ OPEN MAP ]
+    </a>
+
+    <div class="c-divider"></div>
+
+    <!-- RSVP -->
+    <div class="rsvp-section-title">RSVP</div>
+    <div class="rsvp-question">Will you join the party?</div>
+
+    <form id="rsvp-form">
+      <div class="radio-row">
+        <label class="radio-opt">
+          <input type="radio" name="attend" value="yes">
+          <span class="radio-btn btn-yes">YES!</span>
+        </label>
+        <label class="radio-opt">
+          <input type="radio" name="attend" value="no">
+          <span class="radio-btn btn-no">CAN'T MAKE IT</span>
+        </label>
+      </div>
+
+      <div id="rsvp-fields">
+        <input type="text" name="parent_name" placeholder="YOUR NAME (PARENT)"
+               class="px-input" autocomplete="name" required>
+        <input type="text" name="child_name"  placeholder="CHILD'S NAME(S)"
+               class="px-input" required>
+        <button type="submit" class="px-btn btn-grn" id="rsvp-submit">[ SEND RSVP ]</button>
+      </div>
+    </form>
+
+    <div id="rsvp-thanks">
+      <div class="thanks-msg">SEE YOU THERE!</div>
+      <div class="thanks-sub">We can't wait to celebrate with you!</div>
+    </div>
+
+    <div class="c-divider" style="margin-top:14px"></div>
+    <button class="btn-continue" id="modal-close">continue game</button>
+
+  </div>
+</div>
+
+<!-- ── TOUCH CONTROLS ── -->
+<div id="tc">
+  <div class="dpad">
+    <div class="tbtn" id="bl">&#9664;</div>
+    <div class="tbtn" id="br">&#9654;</div>
+  </div>
+  <div class="tbtn" id="bj">JUMP</div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
