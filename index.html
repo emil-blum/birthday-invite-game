@@ -12,7 +12,11 @@
 <div id="rotate-overlay">
   <div class="rotate-msg">
     <div class="rotate-icon">&#x21BB;</div>
-    <div>Please rotate your<br>device to landscape</div>
+    <div>Rotate to landscape<br>to play!</div>
+    <button class="rotate-btn" onclick="tryLandscape()">ENABLE LANDSCAPE</button>
+    <div class="rotate-hint" id="rotate-hint" style="display:none">
+      Enable auto-rotation<br>in your phone settings,<br>then rotate the device.
+    </div>
   </div>
 </div>
 
@@ -134,6 +138,19 @@
 </div>
 
 <script>
+async function tryLandscape() {
+  try {
+    if (document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen();
+    }
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock('landscape');
+    }
+  } catch(e) {
+    document.getElementById('rotate-hint').style.display = 'block';
+  }
+}
+
 function toggleLang() {
   const card = document.getElementById('card');
   const btn  = document.getElementById('lang-btn');

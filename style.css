@@ -18,8 +18,39 @@ html, body {
   background:#3a5e2a;
 }
 
-/* ── ROTATE OVERLAY ── hidden — canvas auto-rotates via JS */
-#rotate-overlay { display:none !important; }
+/* ── ROTATE OVERLAY (portrait mobile) ── */
+#rotate-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#0a1a04;
+  z-index:100;
+  place-items:center;
+}
+@media (max-aspect-ratio: 1/1) {
+  #rotate-overlay { display:grid; }
+}
+.rotate-btn {
+  display:inline-block;
+  margin-top:18px;
+  font-family:'Press Start 2P', monospace;
+  font-size:8px;
+  background:#1a3a0a;
+  border:2px solid #f8c000;
+  color:#f8c000;
+  padding:8px 12px;
+  cursor:pointer;
+  letter-spacing:0.05em;
+  line-height:1.6;
+}
+.rotate-btn:active { background:#2a5a14; }
+.rotate-hint {
+  margin-top:14px;
+  font-family:'Pixelify Sans', sans-serif;
+  font-size:13px;
+  color:#aaa;
+  line-height:1.5;
+}
 .rotate-msg {
   font-family:'Press Start 2P', monospace;
   font-size:12px;
