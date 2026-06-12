@@ -440,7 +440,7 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
         submitBtn.textContent = isPt() ? '[ ENVIAR RSVP ]' : '[ SEND RSVP ]';
         submitBtn.className = 'px-btn btn-grn';
       } else {
-        submitBtn.textContent = isPt() ? '[ OBRIGADO, NAO POSSO ]' : "[ THANKS, CAN'T COME ]";
+        submitBtn.textContent = isPt() ? '[ OBRIGADO, NÃO POSSO ]' : "[ THANKS, CAN'T COME ]";
         submitBtn.className = 'px-btn btn-red';
       }
     });
@@ -1113,9 +1113,9 @@ function drawIntro() {
   sr(px+pw-3, py,      3,  ph, '#f8c000');
 
   // Title: two lines
-  txtF(pt ? 'ESTAS CONVIDADO PARA' : "YOU'RE INVITED TO", cx, py + 14, '#aad4ff', 9);
+  txtF(pt ? 'ESTÁS CONVIDADO PARA' : "YOU'RE INVITED TO", cx, py + 14, '#aad4ff', 9);
   txtP("MADIS'", cx, py + 28, '#ffe040', 10);
-  txtP(pt ? 'ANIVERSARIO' : 'BIRTHDAY', cx, py + 42, '#ff8888', 10);
+  txtP(pt ? 'ANIVERSÁRIO' : 'BIRTHDAY', cx, py + 42, '#ff8888', 10);
 
   sr(px + 12, py + 52, pw - 24, 1, '#444');
 
@@ -1154,7 +1154,7 @@ function drawIntro() {
 
   // Start prompt — lower, with clear gap below language buttons
   if (Math.floor(tick / 28) % 2 === 0) {
-    txtF(pt ? '►  PRIME ESPACO OU TOCA  ◄' : '►  PRESS SPACE OR TAP TO START  ◄',
+    txtF(pt ? '►  PRIME ESPAÇO OU TOCA  ◄' : '►  PRESS SPACE OR TAP TO START  ◄',
          cx, py + 158, '#fff', 9);
   }
 }

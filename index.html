@@ -59,7 +59,7 @@
     <div class="rsvp-section-title">RSVP</div>
     <div class="rsvp-question">
       <span class="en">Will you join the party?</span>
-      <span class="pt">Vens a festa?</span>
+      <span class="pt">Vens à festa?</span>
     </div>
 
     <form id="rsvp-form">
@@ -78,7 +78,7 @@
           <input type="radio" name="attend-radio" value="no">
           <span class="radio-btn btn-no">
             <span class="en">CAN'T MAKE IT</span>
-            <span class="pt">NAO POSSO</span>
+            <span class="pt">NÃO POSSO</span>
           </span>
         </label>
       </div>
@@ -98,7 +98,7 @@
     <div id="rsvp-thanks-yes" class="rsvp-thanks-block">
       <div class="thanks-msg">
         <span class="en">SEE YOU THERE!</span>
-        <span class="pt">ATE LA!</span>
+        <span class="pt">ATÉ LÁ!</span>
       </div>
       <div class="thanks-sub">
         <span class="en">We can't wait to celebrate with you!</span>
@@ -114,7 +114,7 @@
       </div>
       <div class="thanks-sub">
         <span class="en">We'll miss you — hope to see you next time!</span>
-        <span class="pt">Vai ser uma pena! Esperamos te ver na proxima.</span>
+        <span class="pt">Vai ser uma pena! Esperamos te ver na próxima.</span>
       </div>
     </div>
 
@@ -159,7 +159,7 @@ function toggleLang() {
   btn.textContent = isEn ? 'EN' : 'PT';
   // Update input placeholders
   document.getElementById('f-parent').placeholder =
-    isEn ? 'O TEU NOME (PAI/MAE)' : 'YOUR NAME (PARENT)';
+    isEn ? 'O TEU NOME (PAI/MÃE)' : 'YOUR NAME (PARENT)';
   document.getElementById('f-child').placeholder =
     isEn ? 'NOME DO(S) FILHO(S)' : "CHILD'S NAME(S)";
   // Update submit button if already chosen
@@ -173,7 +173,7 @@ function updateSubmitBtn(attend, nowPt) {
   if (attend === 'yes') {
     btn.textContent = nowPt ? '[ ENVIAR RSVP ]' : '[ SEND RSVP ]';
   } else {
-    btn.textContent = nowPt ? '[ OBRIGADO, NAO POSSO ]' : "[ THANKS, CAN'T COME ]";
+    btn.textContent = nowPt ? '[ OBRIGADO, NÃO POSSO ]' : "[ THANKS, CAN'T COME ]";
   }
 }
 </script>
