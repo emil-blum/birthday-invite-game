@@ -20,57 +20,106 @@
 
 <!-- ── PARTY INFO + RSVP MODAL ── -->
 <div id="modal">
-  <div id="card">
+  <div id="card" class="lang-en">
 
-    <div class="c-header">MADIS TURNS 7!</div>
+    <!-- Language toggle -->
+    <button id="lang-btn" class="lang-toggle" onclick="toggleLang()">PT</button>
+
+    <div class="c-header">
+      <span class="en">MADIS TURNS 8!</span>
+      <span class="pt">MADIS FAZ 8 ANOS!</span>
+    </div>
 
     <div class="c-grid">
-      <span class="c-lbl">DATE &raquo;</span>
-      <span class="c-val">FRI 26 JUNE 2026</span>
-      <span class="c-lbl">TIME &raquo;</span>
+      <span class="c-lbl en">DATE &raquo;</span>
+      <span class="c-lbl pt">DATA &raquo;</span>
+      <span class="c-val en">FRI 26 JUNE 2026</span>
+      <span class="c-val pt">SEX 26 JUNHO 2026</span>
+
+      <span class="c-lbl en">TIME &raquo;</span>
+      <span class="c-lbl pt">HORA &raquo;</span>
       <span class="c-val">16:00 &ndash; 20:00</span>
-      <span class="c-lbl">WHERE &raquo;</span>
+
+      <span class="c-lbl en">WHERE &raquo;</span>
+      <span class="c-lbl pt">LOCAL &raquo;</span>
       <span class="c-val">Praia Fluvial de Felinhos,<br>Lago, Portugal</span>
     </div>
 
     <a class="px-btn btn-map" href="https://maps.app.goo.gl/tUTTnRjmzyCPgLY69" target="_blank" rel="noopener">
-      [ OPEN MAP ]
+      <span class="en">[ OPEN MAP ]</span>
+      <span class="pt">[ VER MAPA ]</span>
     </a>
 
     <div class="c-divider"></div>
 
     <!-- RSVP -->
     <div class="rsvp-section-title">RSVP</div>
-    <div class="rsvp-question">Will you join the party?</div>
+    <div class="rsvp-question">
+      <span class="en">Will you join the party?</span>
+      <span class="pt">Vens a festa?</span>
+    </div>
 
     <form id="rsvp-form">
+      <!-- Hidden field tracks YES / NO selection -->
+      <input type="hidden" id="attend-val" name="attend" value="">
+
       <div class="radio-row">
         <label class="radio-opt">
-          <input type="radio" name="attend" value="yes">
-          <span class="radio-btn btn-yes">YES!</span>
+          <input type="radio" name="attend-radio" value="yes">
+          <span class="radio-btn btn-yes">
+            <span class="en">YES!</span>
+            <span class="pt">SIM!</span>
+          </span>
         </label>
         <label class="radio-opt">
-          <input type="radio" name="attend" value="no">
-          <span class="radio-btn btn-no">CAN'T MAKE IT</span>
+          <input type="radio" name="attend-radio" value="no">
+          <span class="radio-btn btn-no">
+            <span class="en">CAN'T MAKE IT</span>
+            <span class="pt">NAO POSSO</span>
+          </span>
         </label>
       </div>
 
       <div id="rsvp-fields">
-        <input type="text" name="parent_name" placeholder="YOUR NAME (PARENT)"
+        <input type="text" id="f-parent" name="parent_name"
+               placeholder="YOUR NAME (PARENT)"
                class="px-input" autocomplete="name" required>
-        <input type="text" name="child_name"  placeholder="CHILD'S NAME(S)"
+        <input type="text" id="f-child" name="child_name"
+               placeholder="CHILD'S NAME(S)"
                class="px-input" required>
         <button type="submit" class="px-btn btn-grn" id="rsvp-submit">[ SEND RSVP ]</button>
       </div>
     </form>
 
-    <div id="rsvp-thanks">
-      <div class="thanks-msg">SEE YOU THERE!</div>
-      <div class="thanks-sub">We can't wait to celebrate with you!</div>
+    <!-- Thanks: YES -->
+    <div id="rsvp-thanks-yes" class="rsvp-thanks-block">
+      <div class="thanks-msg">
+        <span class="en">SEE YOU THERE!</span>
+        <span class="pt">ATE LA!</span>
+      </div>
+      <div class="thanks-sub">
+        <span class="en">We can't wait to celebrate with you!</span>
+        <span class="pt">Mal podemos esperar para celebrar contigo!</span>
+      </div>
+    </div>
+
+    <!-- Thanks: NO -->
+    <div id="rsvp-thanks-no" class="rsvp-thanks-block">
+      <div class="thanks-msg">
+        <span class="en">THANKS FOR LETTING US KNOW!</span>
+        <span class="pt">OBRIGADO POR NOS AVISARES!</span>
+      </div>
+      <div class="thanks-sub">
+        <span class="en">We'll miss you — hope to see you next time!</span>
+        <span class="pt">Vai ser uma pena! Esperamos te ver na proxima.</span>
+      </div>
     </div>
 
     <div class="c-divider" style="margin-top:14px"></div>
-    <button class="btn-continue" id="modal-close">continue game</button>
+    <button class="btn-continue" id="modal-close">
+      <span class="en">continue game</span>
+      <span class="pt">continuar jogo</span>
+    </button>
 
   </div>
 </div>
@@ -84,6 +133,34 @@
   <div class="tbtn" id="bj">JUMP</div>
 </div>
 
+<script>
+function toggleLang() {
+  const card = document.getElementById('card');
+  const btn  = document.getElementById('lang-btn');
+  const isEn = card.classList.contains('lang-en');
+  card.classList.toggle('lang-en', !isEn);
+  card.classList.toggle('lang-pt',  isEn);
+  btn.textContent = isEn ? 'EN' : 'PT';
+  // Update input placeholders
+  document.getElementById('f-parent').placeholder =
+    isEn ? 'O TEU NOME (PAI/MAE)' : 'YOUR NAME (PARENT)';
+  document.getElementById('f-child').placeholder =
+    isEn ? 'NOME DO(S) FILHO(S)' : "CHILD'S NAME(S)";
+  // Update submit button if already chosen
+  const attend = document.getElementById('attend-val').value;
+  if (attend) updateSubmitBtn(attend, isEn);
+}
+
+function updateSubmitBtn(attend, nowPt) {
+  const btn = document.getElementById('rsvp-submit');
+  if (!btn || btn.disabled) return;
+  if (attend === 'yes') {
+    btn.textContent = nowPt ? '[ ENVIAR RSVP ]' : '[ SEND RSVP ]';
+  } else {
+    btn.textContent = nowPt ? '[ OBRIGADO, NAO POSSO ]' : "[ THANKS, CAN'T COME ]";
+  }
+}
+</script>
 <script src="game.js"></script>
 </body>
 </html>
