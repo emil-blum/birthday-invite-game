@@ -28,6 +28,31 @@ const canvas = document.getElementById('c');
 const ctx    = canvas.getContext('2d');
 let S = 1, cssS = 1;
 
+function applyPortraitLayout(portrait) {
+  canvas.style.transform = portrait ? 'rotate(90deg)' : '';
+  const tc = document.getElementById('tc');
+  if (!tc) return;
+  if (portrait) {
+    tc.style.top            = '0';
+    tc.style.bottom         = '0';
+    tc.style.right          = '0';
+    tc.style.left           = 'auto';
+    tc.style.flexDirection  = 'column-reverse';
+    tc.style.alignItems     = 'center';
+    tc.style.justifyContent = 'space-between';
+    tc.style.padding        = '16px 10px';
+  } else {
+    tc.style.top            = '';
+    tc.style.bottom         = '0';
+    tc.style.right          = '0';
+    tc.style.left           = '0';
+    tc.style.flexDirection  = '';
+    tc.style.alignItems     = 'flex-end';
+    tc.style.justifyContent = 'space-between';
+    tc.style.padding        = '10px 16px';
+  }
+}
+
 function resize() {
   const dpr = window.devicePixelRatio || 1;
   const portrait = window.innerWidth < window.innerHeight;
@@ -40,6 +65,7 @@ function resize() {
   canvas.style.width  = Math.round(GW * cssS) + 'px';
   canvas.style.height = Math.round(GH * cssS) + 'px';
   ctx.imageSmoothingEnabled = false;
+  applyPortraitLayout(portrait);
 }
 resize();
 window.addEventListener('resize', resize);
@@ -205,6 +231,7 @@ canvas.addEventListener('click', e => { if (STATE === 'INTRO') introClick(e.clie
 function setupTouch() {
   if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
   document.getElementById('tc').style.display = 'flex';
+  applyPortraitLayout(window.innerWidth < window.innerHeight);
   function hold(id, key) {
     const el = document.getElementById(id);
     el.addEventListener('touchstart', e => {

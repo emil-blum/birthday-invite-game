@@ -18,24 +18,8 @@ html, body {
   background:#3a5e2a;
 }
 
-/* ── ROTATE OVERLAY ── hidden — we auto-rotate the canvas instead */
+/* ── ROTATE OVERLAY ── hidden — canvas auto-rotates via JS */
 #rotate-overlay { display:none !important; }
-
-/* ── AUTO-ROTATE in portrait: spin canvas to landscape ── */
-@media (max-aspect-ratio: 1/1) {
-  #c { transform: rotate(90deg); }
-
-  /* Touch controls move to the right edge, stacked vertically */
-  #tc {
-    top:0; bottom:0;
-    right:0; left:auto;
-    width:auto;
-    flex-direction:column-reverse;
-    align-items:center;
-    justify-content:space-between;
-    padding:16px 10px;
-  }
-}
 .rotate-msg {
   font-family:'Press Start 2P', monospace;
   font-size:12px;
